@@ -26,7 +26,8 @@ logger.setLevel( logging.INFO )
 
 
 ## Step 0 - establishing directories
-working_path = '/Users/daniellawson/documents/activedir/bch/projects.nosync'
+# working_path = '/Users/daniellawson/documents/activedir/bch/projects.nosycn'
+working_path = '/home_local/daniellawson/Documents/projects'
 
 ##output
 output_dir = working_path + '/Registration/outputs'
@@ -170,11 +171,5 @@ pitch_pos = plot_parameter('theta', parameters[4],'m')
 roll_pos = plot_parameter('phi', parameters[5],'y')
 
 # consider making one plot 
-
-
-
-
-
-
 
 
