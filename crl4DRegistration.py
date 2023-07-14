@@ -60,10 +60,11 @@ def open_file():
         # file = '/1_3_12_2_1107_5_2_43_166200_2023040617472437272833536_0_0_0_dwi_acq-CUSP90_dir-AP_20230406172644_14.nii.'
         # input_dir = working_path +'Warfieldatlas/subjects/' + subjects[2] + '/' + scan[0] 
         # file_path = input_dir +file
-        file_path = sys.argv[0]
+        print(sys.argv)
+        file_path = sys.argv[1]
     return file_path 
 image = open_file()
-# image = "/Users/daniellawson/documents/activedir/bch/projects/warfieldatlas/subjects/34613-042/'Session 08'/diffusion/1_3_12_2_1107_5_2_43_166200_2023040617472437272833536_0_0_0_dwi_acq-CUSP90_dir-AP_20230406172644_14.nii"
+
 input_img = SimpleITK.ReadImage(image)
 logger.info('Input MRI is ' + image)
 
@@ -130,7 +131,8 @@ for cur_iter in range(0, 5): # num_timepoints, range(1, 18) == range(0,17)
         moving_img = '/data/mri4dData' + newfile
         cur_trans = f'/data/alignment/transform_{cur_iter}.txt'
         output_file = f'/data/alignment/alignment_{cur_iter}.nii'
-        cmd = docker_prefix + " " + directory_mapping + " " + "--name RigidRegistration --rm ccts3.aws.chboston.org:5151/computationalradiology/crkit:latest /opt/crkit/bin/crlRigidRegistration" + " " + fixed_img + " " + moving_img+ " " + output_file + " " + cur_trans 
+        # cmd = docker_prefix + " " + directory_mapping + " " + "--name RigidRegistration --rm ccts3.aws.chboston.org:5151/computationalradiology/crkit:latest /opt/crkit/bin/crlRigidRegistration" + " " + fixed_img + " " + moving_img+ " " + output_file + " " + cur_trans
+        cmd = docker_prefix + " " + directory_mapping + " " + "--name RigidRegistration --rm crl/crkit:latest /opt/crkit/bin/crlRigidRegistration" + " " + fixed_img + " " + moving_img+ " " + output_file + " " + cur_trans 
         #execute command
         os.system(cmd)
         # # delete duplicate reference volume
@@ -173,3 +175,4 @@ roll_pos = plot_parameter('phi', parameters[5],'y')
 # consider making one plot 
 
 
+# python3 /home_local/daniellawson/Documents/projects/Registration/Scripts/crl4DRegistration.py /home_local/daniellawson/Documents/projects/WarfieldAtlas/subjects/34613-042/session-8/fmri/1_3_12_2_1107_5_2_43_166200_2023051118492116489896421_0_0_0_func-bold_task-rest960_run-01_20230511182539_21.nii
