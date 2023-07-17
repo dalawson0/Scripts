@@ -30,7 +30,8 @@ logger.setLevel( logging.INFO )
 working_path = '/home_local/daniellawson/Documents/projects'
 
 ##output
-output_dir = working_path + '/Registration/outputs'
+# output_dir = working_path + '/Registration/outputs'
+ouput_dir = working_path + '/Warfieldatlas/outputs/'
 if not os.path.isdir(output_dir):
     os.mkdir(output_dir)
 # set up subdirectories within the output directories
@@ -47,21 +48,22 @@ for item in new_dir:
 ## Step 1. load the image - scan_08-Subject
 # input 
 def open_file():
-    tf = True
-    if tf == True:
-    # try: # open up GUI if the system supports it
-        file_path = filedialog.askopenfilename()
-    # except RuntimeError:
-        # logger.info('No file has been selected')
-    else:
-        logger.info('No GUI available. Cannot use filedialog. Please specify a complete file path.')
-        # scan = ['fmri', 'scout', 'T1-scan', 'T2-scan', 'fluid-suppressed']
-        # subjects = ['34613-030','34613-034', '34613-042', '34613-043']
-        # file = '/1_3_12_2_1107_5_2_43_166200_2023040617472437272833536_0_0_0_dwi_acq-CUSP90_dir-AP_20230406172644_14.nii.'
-        # input_dir = working_path +'Warfieldatlas/subjects/' + subjects[2] + '/' + scan[0] 
-        # file_path = input_dir +file
-        print(sys.argv)
-        file_path = sys.argv[1]
+    file_path = sys.argv[1]
+    # tf = True
+    # if tf == True:
+    # # try: # open up GUI if the system supports it
+    #     file_path = filedialog.askopenfilename()
+    # # except RuntimeError:
+    #     # logger.info('No file has been selected')
+    # else:
+    #     logger.info('No GUI available. Cannot use filedialog. Please specify a complete file path.')
+    #     # scan = ['fmri', 'scout', 'T1-scan', 'T2-scan', 'fluid-suppressed']
+    #     # subjects = ['34613-030','34613-034', '34613-042', '34613-043']
+    #     # file = '/1_3_12_2_1107_5_2_43_166200_2023040617472437272833536_0_0_0_dwi_acq-CUSP90_dir-AP_20230406172644_14.nii.'
+    #     # input_dir = working_path +'Warfieldatlas/subjects/' + subjects[2] + '/' + scan[0] 
+    #     # file_path = input_dir +file
+    #     print(sys.argv)
+    #     file_path = sys.argv[1]
     return file_path 
 image = open_file()
 
@@ -104,7 +106,7 @@ first = SimpleITK.WriteImage(reference_vol, ref_path)
 
 # Step 3. Extract subsequent volumes and preform Registration 
 time = [] # start at time = 0
-for cur_iter in range(0, 5): # num_timepoints, range(1, 18) == range(0,17)
+for cur_iter in range(0, 2): # num_timepoints, range(1, 18) == range(0,17)
     time.append(cur_iter)
     if cur_iter == 0:
         logger.info('Iterating through the subsequent volumes within the 4D image. Beginning regestriation')
@@ -126,15 +128,22 @@ for cur_iter in range(0, 5): # num_timepoints, range(1, 18) == range(0,17)
 # Preform 6 DOF registration:
         #prep inputs
         docker_prefix = 'docker run -v'
-        directory_mapping = tempdir + ':/data/'
+        directory_mapping = tempdir + ':/data'
         fixed_img = '/data/mri4dData/reference-volume.nii'
         moving_img = '/data/mri4dData' + newfile
         cur_trans = f'/data/alignment/transform_{cur_iter}.txt'
         output_file = f'/data/alignment/alignment_{cur_iter}.nii'
         # cmd = docker_prefix + " " + directory_mapping + " " + "--name RigidRegistration --rm ccts3.aws.chboston.org:5151/computationalradiology/crkit:latest /opt/crkit/bin/crlRigidRegistration" + " " + fixed_img + " " + moving_img+ " " + output_file + " " + cur_trans
-        cmd = docker_prefix + " " + directory_mapping + " " + "--name RigidRegistration --rm crl/crkit:latest /opt/crkit/bin/crlRigidRegistration" + " " + fixed_img + " " + moving_img+ " " + output_file + " " + cur_trans 
+        cmd = docker_prefix + " " + directory_mapping + " " + "crkit:latest /opt/crkit/bin/crlRigidRegistration"+ " " + fixed_img + " " + moving_img+ " " + output_file + " " + cur_trans 
         #execute command
+
+        # for debugging the docker errors
+        print('\n', cmd, '\n')
+        # os.system("docker run --rm container ")
         os.system(cmd)
+        # os.system("docker run container2 --rm")
+
+        '''
         # # delete duplicate reference volume
         if cur_iter == 0:
             os.remove(cur_output_pth)
@@ -155,6 +164,8 @@ parameters = ReadnWrite(alignworkdir)
 
 
 ## step 5. plotting parameters
+ylabels = ['Rotation-X','Rotation-Y','Rotation-Z','Translation-X', 'Translation-Y','Translation-Z']
+colors = ['m','y','k','r', 'b', 'g']
 def plot_parameter(ylabel, measurement,color = 'k'):
     plt.plot(time,measurement, color) # could be a np.arrays or lists
     # Gold, hotpink red blue yellow, hexidecimal (rgb, #667788)
@@ -165,14 +176,18 @@ def plot_parameter(ylabel, measurement,color = 'k'):
     plt.savefig(f'{figworkdir}/{ylabel}vTime.pdf',dpi=200)
     plt.show() 
 
-x_pos = plot_parameter('x-position', parameters[0],"r")
-y_pos = plot_parameter('y-position', parameters[1],'b') 
-z_pos = plot_parameter('z-position', parameters[2],'g') 
-yaw_pos = plot_parameter('psi', parameters[3])
-pitch_pos = plot_parameter('theta', parameters[4],'m')
-roll_pos = plot_parameter('phi', parameters[5],'y')
+# x_plot = plot_parameter('x-position', parameters[0],"r")
+# y_pos = plot_parameter('y-position', parameters[1],'b') 
+# z_pos = plot_parameter('z-position', parameters[2],'g') 
+# yaw_pos = plot_parameter('psi', parameters[3])
+# pitch_pos = plot_parameter('theta', parameters[4],'m')
+# roll_pos = plot_parameter('phi', parameters[5],'y')
 
+index = 0 
+for label in ylabels:
+    plot_parameter(label,parameters[index], colors[index])
 # consider making one plot 
 
 
 # python3 /home_local/daniellawson/Documents/projects/Registration/Scripts/crl4DRegistration.py /home_local/daniellawson/Documents/projects/WarfieldAtlas/subjects/34613-042/session-8/fmri/1_3_12_2_1107_5_2_43_166200_2023051118492116489896421_0_0_0_func-bold_task-rest960_run-01_20230511182539_21.nii
+'''
