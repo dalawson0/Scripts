@@ -7,8 +7,8 @@ workingdir = '/Users/daniellawson/documents/activedir/bch/project/registration/o
 def ReadnWrite(workingdir):
     dir_content = os.listdir(workingdir) # goes from the top down (sorted)
   
-    x,y,z,yaw,pitch,roll,numbers = [],[],[],[],[],[],[]
-    i,j,k,psi,theta,phi = 0,1,2,3,4,5 # indexes
+    rotationX,rotationY,rotationZ,translationX,translationY,translationZ,numbers = [],[],[],[],[],[],[]
+    rx,ry,rz,tx,ty,tz = 0,1,2,3,4,5 # indexes
 
     # ## check the first file for the fixed parameters in x,y,z(likely do this separately)
     # with open(workingdir + '/transform_2.txt', mode = 'r') as fixed_file:
@@ -39,7 +39,7 @@ def ReadnWrite(workingdir):
             element = line_params.split() # make a list that split up the 'parmeters' & individual numbers
             numbers.append(element[1::]) # grab only the numbers 
             # print('\n',numbers) 
-            x.append(float(numbers[counter][i])),y.append(float(numbers[counter][j])),z.append(float(numbers[counter][k])),yaw.append(float(numbers[counter][psi])),pitch.append(float(numbers[counter][theta])),roll.append(float(numbers[counter][phi]))# append each parameter list
+            rotationX.append(float(numbers[counter][rx])),rotationY.append(float(numbers[counter][ry])),rotationZ.append(float(numbers[counter][rz])),translationX.append(float(numbers[counter][tx])),translationY.append(float(numbers[counter][ty])),translationZ.append(float(numbers[counter][tz]))# append each parameter list
             # print(x,y,z,yaw,pitch,roll)
             counter += 1
         # try:
@@ -52,8 +52,8 @@ def ReadnWrite(workingdir):
     
  # append the inital file with transformation parameters 
     with open(workingdir + '/All-transformations.txt' , mode ='w+') as file: # after you have gone through the file, and appened params list, delete the file (save space)
-        file.write(f'\n\nX:\n{x}\n\nY:\n{y}\n\nZ:\n{z}\n\nYaw:\n{yaw}\n\nPitch:\n{pitch}\n\nRoll:\n{roll}') 
-    return x,y,z,yaw,pitch,roll
+        file.write(f'\n\nRotation-X:\n{rotationX}\n\nnRotation-Y:\n{rotationY}\n\nnRotation-Z:\n{rotationZ}\n\nTranslation-X:\n{translationX}\n\nTranslation-Y:\n{translationY}\n\nTranslation-Z:\n{translationZ}') 
+    return rotationX,rotationY,rotationZ,translationX,translationY,translationZ
 
 '''
 def write_parameters(workingdir):
